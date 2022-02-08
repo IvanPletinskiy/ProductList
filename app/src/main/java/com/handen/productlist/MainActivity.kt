@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ProductListApp()
+            ProductListApplication()
         }
     }
 }
@@ -56,7 +56,7 @@ fun ProductListApp() {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    ProductListApp()
+    ProductListApplication()
 }
 
 @Composable
