@@ -24,12 +24,17 @@ import com.handen.productlist.list.ProductListScreen
 import com.handen.productlist.ui.theme.Grey
 import com.handen.productlist.ui.theme.ProductListTheme
 import com.handen.productlist.ui.theme.Purple500
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.components.SingletonComponent
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ProductListApplication()
+            ProductListApp()
         }
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.handen.productlist.list.ProductListViewModel.State.ConnectionError
@@ -26,8 +27,7 @@ import com.handen.productlist.list.ProductListViewModel.State.Loading
 import com.handen.productlist.ui.theme.Grey
 
 @Composable
-fun ProductListScreen(viewModel: ProductListViewModel = viewModel()) {
-    Text(text = "List")
+fun ProductListScreen(viewModel: ProductListViewModel = hiltViewModel()) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -42,7 +42,7 @@ fun ProductListScreen(viewModel: ProductListViewModel = viewModel()) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Clothes",
+                        text = "Jewelery",
                         fontSize = 22.sp,
                         color = Color.Black
                     )

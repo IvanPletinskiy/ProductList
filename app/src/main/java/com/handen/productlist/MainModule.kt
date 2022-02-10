@@ -1,7 +1,10 @@
 package com.handen.productlist
 
+import android.content.Context
+import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.handen.productlist.list.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,8 +37,27 @@ object MainModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder().build()
+    fun provideFakeStoreApi(retrofit: Retrofit): FakeStoreApi {
+        return retrofit.create(FakeStoreApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRemoteDataService(fakeStoreApi: FakeStoreApi): RemoteDataService {
+        return RemoteDataServiceImpl(fakeStoreApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideConnectivityManagerService(@ApplicationContext context: Context): ConnectivityManagerService {
+        return ConnectivityManagerServiceImpl(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(context, AppDatabase::class.java, "product_list_database")
+            .build()
     }
 
     @Provides

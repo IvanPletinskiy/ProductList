@@ -2,10 +2,17 @@ package com.handen.productlist.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProductListViewModel: ViewModel() {
+@HiltViewModel
+class ProductListViewModel @Inject constructor(
+    private val remoteDataService: RemoteDataService,
+    private val appDatabase: AppDatabase,
+    private val connectivityManagerService: ConnectivityManagerService
+): ViewModel() {
 
     val state: MutableStateFlow<State> = MutableStateFlow(State.Loading)
 
@@ -18,9 +25,34 @@ class ProductListViewModel: ViewModel() {
             description = "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
             image = "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"
         )))
-//        state.value = State.ConnectionError
-        viewModelScope.launch {
 
+        state.value = State.Loading
+        viewModelScope.launch {
+            if(connectivityManagerService.checkHaveInternetConnection()) {
+                runCatching {
+                    remoteDataService.getProducts()
+                }
+                    .onSuccess {
+                        appDatabase.productDao.saveProducts(it)
+                        state.value = State.Loaded(it)
+                    }
+                    .onFailure {
+                        it.printStackTrace()
+                        val products = appDatabase.productDao.getProducts()
+                        if(products.isEmpty()) {
+                            state.value = State.ConnectionError
+                        } else {
+                            state.value = State.LoadedFromCache(products)
+                        }
+                    }
+            } else {
+                val products = appDatabase.productDao.getProducts()
+                if(products.isEmpty()) {
+                    state.value = State.ConnectionError
+                } else {
+                    state.value = State.LoadedFromCache(products)
+                }
+            }
         }
     }
 
