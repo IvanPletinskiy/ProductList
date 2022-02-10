@@ -8,10 +8,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -63,23 +62,52 @@ fun ProductListScreen(viewModel: ProductListViewModel = hiltViewModel()) {
             is ConnectionError -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(modifier = Modifier.size(32.dp), imageVector = Icons.Outlined.Warning, contentDescription = null)
+                        Icon(
+                            modifier = Modifier.size(32.dp),
+                            imageVector = Icons.Outlined.Warning,
+                            contentDescription = null
+                        )
                         Text(text = "Check your internet connection")
                     }
                 }
             }
             is ProductListViewModel.State.Loaded -> {
                 val products = (state as ProductListViewModel.State.Loaded).products
-                Box(modifier = Modifier.fillMaxSize()) {
-                    LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
-                        items(products) {
-                            ItemProduct(product = it)
+                var query by remember { mutableStateOf("") }
+                Column(modifier = Modifier.fillMaxSize()) {
+                    SearchField(query, onSearchQueryChanged = {
+                        query = it
+                    })
+
+                    val filteredProducts = products.filter { it.title.contains(query) }
+                    if (filteredProducts.isEmpty()) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(top = 16.dp),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    modifier = Modifier.size(32.dp),
+                                    imageVector = Icons.Outlined.Search,
+                                    contentDescription = null
+                                )
+                                Text(text = "Nothing found")
+                            }
+                        }
+                    } else {
+                        LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
+                            items(filteredProducts) {
+                                ItemProduct(product = it)
+                            }
                         }
                     }
                 }
             }
             is ProductListViewModel.State.LoadedFromCache -> {
                 val products = (state as ProductListViewModel.State.LoadedFromCache).products
+                var query by remember { mutableStateOf("") }
                 Column(modifier = Modifier.fillMaxSize()) {
                     Box(
                         modifier = Modifier
@@ -93,15 +121,48 @@ fun ProductListScreen(viewModel: ProductListViewModel = hiltViewModel()) {
                             color = Grey,
                         )
                     }
-                    LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
-                        items(products) {
-                            ItemProduct(product = it)
+                    SearchField(query, onSearchQueryChanged = {
+                        query = it
+                    })
+                    val filteredProducts = products.filter { it.title.contains(query) }
+                    if (filteredProducts.isEmpty()) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(top = 16.dp),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    modifier = Modifier.size(32.dp),
+                                    imageVector = Icons.Outlined.Search,
+                                    contentDescription = null
+                                )
+                                Text(text = "Nothing found")
+                            }
+                        }
+                    } else {
+                        LazyColumn(contentPadding = PaddingValues(vertical = 8.dp)) {
+                            items(filteredProducts) {
+                                ItemProduct(product = it)
+                            }
                         }
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun SearchField(query: String, onSearchQueryChanged: (String) -> Unit) {
+    TextField(
+        value = query,
+        onValueChange = onSearchQueryChanged,
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    )
 }
 
 @Composable
