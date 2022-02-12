@@ -15,12 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.handen.productlist.list.ProductListScreen
+import com.handen.productlist.profile.ProfileViewModel
 import com.handen.productlist.ui.theme.Grey
 import com.handen.productlist.ui.theme.ProductListTheme
 import com.handen.productlist.ui.theme.Purple500
@@ -42,10 +45,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ProductListApp() {
     val navController = rememberNavController()
+    val profileViewModel: ProfileViewModel =  viewModel()
     ProductListTheme {
         Column {
             NavHost(navController = navController, startDestination = "product_list", modifier = Modifier.weight(1f)) {
-                composable("profile") { ProfileScreen() }
+                composable("profile") { ProfileScreen(profileViewModel) }
                 composable("product_list") {
                     ProductListScreen()
                 }
